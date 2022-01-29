@@ -14,6 +14,13 @@ class User:
 
     @staticmethod
     def user_decoder(obj):
-      print(obj)
       return User(obj['username'], obj['social_credit'], obj['level'], obj['id'])
 
+
+
+class Admin(User):
+  def reduce(user, amount):
+    user.decrease_social_credit(amount)
+
+  def increase(user, amount):
+    user.increase_social_credit(amount)

@@ -1,19 +1,26 @@
 from replit import db
-from user import User
+from user import User, Admin
 import json
 
 def add_users_to_db(list_users):
     users = db["users"]
     for user in list_users:
-      print(user)
+      print(f"user detail: {user.name, user.id}" )
       _user = User(user.name, 0, 0, user.id)
       users.append(json.dumps(_user.__dict__))
 
+def add_admins(list_users):
+  for user in list_users:
+    if user.id == 583223852641812499:
+      _user = Admin(user.name, 0, 0, user.id)
+      db["admins"].append(json.dumps(_user.__dict__))
+      
 def setup_tables(list_users):
     if "users" not in db.keys():
         db["users"] = []
         add_users_to_db(list_users)
-
+        db["admins"] = []
+        add_admins(list_users)
 
 
 
@@ -54,3 +61,12 @@ def set_user(user):
   del db["users"][get_user_id(user.id)]
   print("[INFO]: Saving user: "+d)
   db["users"].append(d)  
+
+
+def get_admin(user):
+  for admin in db["admins"]:
+    _user = user
+    if admin.id == _user.id:
+      _user = Admin(_user.username, _user.social_credit, _user.level, _user.id)
+      return _user
+  return None

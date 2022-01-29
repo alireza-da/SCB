@@ -1,19 +1,20 @@
-from replit import db
 import discord
 import credentials
-from setup_db import setup_tables, add_users_to_db, get_user, set_user, get_user_occurance
-from respond_randomizer import evil_randomizer
+from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin
+from discord.ext import commands
+from respond_randomizer import evil_randomizer, happy_zarif_randomizer
+from keep_alive import keep_alive
+from youtube import YTDLSource
 
-
-intents = discord.Intents.default()
+intents = discord.Intents.all()
 intents.members = True
-client = discord.Client(intents=intents)
-
+client = commands.Bot(command_prefix='$',intents=intents)
+# bot = commands.Bot(command_prefix='$',intents=intents)
+FFMPEG_OPTIONS = {}
+guild = None
 
 def get_all_members():
     res = client.get_guild(869221659733807125).members
-    for user in res:
-        print(user.name)
     return res
 
 
@@ -22,33 +23,200 @@ async def on_ready():
     print(f"Logged In as {client.user}")
     # del db["users"]
     setup_tables(get_all_members())
+    
 
 
 @client.event
 async def on_message(message):
-    if message.author == client.user:
-        return
-    user = message.author
-    user = get_user(message.author.id)
-    if user:
-      if message.content.startswith('$salavat') or message.content.startswith('$صلوات'):
-            await message.channel.send(f" اللّهم صلّ علی مُحمّد و آلِ محمّد و عجّل فرجهم {user.username}")
-            with open("assets/plus15sc.png", "rb") as f:
-                plus_15_pic = discord.File(f)
-                await message.channel.send(file=plus_15_pic)
-            print(f"[INFO]: Current Social Credit: {user.social_credit}")
-            print(f"[INFO]: User Occurance: {get_user_occurance(user.id)}")
-            user.increase_social_credit(15)
-            await message.channel.send(f"Social Credit Balance {user.social_credit}")
-            set_user(user)
+  ctx = await client.get_context(message)
+  if message.author == client.user:
+      return
+  user = message.author
+  user = get_user(user.id)
+  if user:
+    if message.content.startswith('salavat') or message.content.startswith('صلوات'):
+          await message.channel.send(f" اللّهم صلّ علی مُحمّد و آلِ محمّد و عجّل فرجهم {user.username}, +15 social credit")
+          with open("assets/plus15sc.png", "rb") as SC15:
+              plus_15_pic = discord.File(SC15)
+              await message.channel.send(file=plus_15_pic)
+          print(f"[INFO]: Current Social Credit: {user.social_credit}")
+          # print(f"[INFO]: User Occurance: {get_user_occurance(user.id)}")
+          user.increase_social_credit(15)
+          await message.channel.send(f"Social Credit Balance {user.social_credit}")
+          set_user(user)
 
-      if "Feshar" in message.content or "feshar" in message.content or "فشار" in message.content:
-        await message.channel.send(f"Feshar estefade kardi, {user.username}")
-        with open(f"assets/{evil_randomizer()}", "rb") as f:
-                minus_30_pic = discord.File(f)
-                await message.channel.send(file=minus_30_pic)
-        user.decrease_social_credit(30)
+    if "feshar" in message.content.lower() or "فشار" in message.content:
+      await message.channel.send(f"{user.username}, Feshar estefade kardi,-30 social credit")
+      with open(f"assets/{evil_randomizer()}", "rb") as f:
+              minus_30_pic = discord.File(f)
+              await message.channel.send(file=minus_30_pic)
+      user.decrease_social_credit(30)
+      await message.channel.send(f"Social Credit Balance {user.social_credit}")
+      set_user(user)
+    
+    if "kir" in message.content.lower() or "کیر" in message.content:
+      await message.channel.send(f"{user.username}, mohtavaye na monaseb, -300 social credit")
+      with open(f"assets/{evil_randomizer()}", "rb") as f:
+              minus_30_pic = discord.File(f)
+              await message.channel.send(file=minus_30_pic)
+      user.decrease_social_credit(300)
+      await message.channel.send(f"Social Credit Balance {user.social_credit}")
+      set_user(user)
+
+    if "marg bar amrica" in message.content.lower() or "مرگ بر آمریکا" in message.content:
+      await message.channel.send(f"{user.username}, kare basiji anjam dadi +15 Social credit")
+      user.increase_social_credit(15)
+      with open(f"assets/{happy_zarif_randomizer()}", "rb") as SC15:
+        plus_15_pic = discord.File(SC15)
+        await message.channel.send(file=plus_15_pic)
+      await message.channel.send(f"Social Credit Balance {user.social_credit}")
+      set_user(user)
+      
+    if "salam" in message.content.lower() or "سلام" in message.content or "hi" in message.content.lower() or "hello" in message.content.lower() :
+        await message.channel.send(f"{user.username}, salam bar shoma shahrvand aziz, +15 Social credit")
+        user.increase_social_credit(15)
+        with open(f"assets/{happy_zarif_randomizer()}", "rb") as SC15:
+          plus_15_pic = discord.File(SC15)
+          await message.channel.send(file=plus_15_pic)
         await message.channel.send(f"Social Credit Balance {user.social_credit}")
         set_user(user)
+
+    if "dota" in message.content.lower() or "dota2" in message.content.lower() or "dota 2" in message.content.lower() or "دوتا" in message.content or "دوتا2" in message.content:
+      await message.channel.send(f"{user.username} parsi ra pas bedarim va az kalame defa az bastan 2 estefade konim, -30 social credit")
+      with open(f"assets/{evil_randomizer()}", "rb") as f:
+        minus_30_pic = discord.File(f)
+        await message.channel.send(file=minus_30_pic)
+      user.decrease_social_credit (30)
+      await message.channel.send(f"Social Credit Balance {user.social_credit}")
+      set_user(user)
+  
+    if message.content.startswith("$kahesh "):
+      admin = get_admin(user)
+      if admin:
+        args = message.content.split(' ')
+        target = get_user(args[1])
+        if target:
+          amount = args[2]
+          admin.reduce(target, int(amount))
         
+    if message.content.startswith("$p "):
+      await join(message)
+
+    if message.content.startswith("$dc"):
+      await disconnect(message)
+
+    if message.content.startswith("$play_yt "):
+      await play_yt(ctx, message.content.split(' ')[1])
+      
+  await client.process_commands(message)
+
+async def disconnect(message):
+  channel = message.author.voice.channel
+  if channel:
+    try:
+      print(f"[INFO]: Disconnecting from {channel.name}")
+      vc = channel.guild.voice_client
+      await vc.disconnect()
+    except:
+      pass
+
+
+
+@client.event
+async def join(message):
+  channel = message.author.voice.channel
+  print(f"[INFO]: Joining {channel}")
+  if "bing" in message.content.split(' ') and "chilling" in message.content.split(' '):
+    return await play_binchilin(message)
+  if "zarif" in message.content.split(' '):
+    return await p_zarif(message)
+  else:
+    return await play_yt(await client.get_context(message), message.content.split(' ')[1])
+  return await channel.connect()
+
+
+async def play_binchilin(message):
+  user = message.author
+  voice_channel= user.voice.channel
+  if voice_channel != None:
+    vc = voice_channel.guild.voice_client
+    try:
+      vc = await voice_channel.connect()
+      
+    except:
+      pass
+    source = discord.FFmpegPCMAudio("assets/john_cena_eats_bing_chilling_in_1080p_cc_2520698433256124212.m4a", **FFMPEG_OPTIONS)
+    vc.play(source)
+  else:
+      await client.say('User is not in a channel.')
+
+@client.command(name="p_zarif")
+async def p_zarif(message):
+  user= message.author
+  voice_channel= user.voice.channel
+  if voice_channel != None:
+    vc = voice_channel.guild.voice_client
+    try:
+      vc = await voice_channel.connect()
+      
+    except:
+      pass
+    source = discord.FFmpegPCMAudio("assets/zarif talking chinies.m4a", **FFMPEG_OPTIONS)
+    vc.play(source)
+  else:
+      await client.say('User is not in a channel.')
+
+@client.command(name="sc")     
+async def sc(ctx):
+  user=ctx.message.author
+  user=get_user(user.id)
+  if user:
+    await ctx.send(f" your current social credit balance is {user.social_credit}")
+
+@client.command(name='play_yt', help='Stream an YT content')
+async def play_yt(ctx,url):
+  try :
+      user = ctx.message.author
+      voice_channel = user.voice.channel
+      print(voice_channel)
+      if voice_channel != None:
+        vc = voice_channel.guild.voice_client
+        try:
+          vc = await voice_channel.connect()
+        except:
+          await ctx.send("The bot is already connected to a voice channel.")
+        filename = await YTDLSource.from_url(url, loop=client.loop)
+        vc.play(discord.FFmpegPCMAudio(source=filename))
+        await ctx.send('**Now playing:** {}'.format(filename))          
+  except:
+    pass
+    # await ctx.send("The bot is not connected to a voice channel.")
+
+@client.command(name='pause', help='This command pauses the song')
+async def pause(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_playing():
+      await ctx.send("paused")
+      await voice_client.pause()
+    else:
+      await ctx.send("The bot is not playing anything at the moment.")
+    
+@client.command(name='resume', help='Resumes the song')
+async def resume(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_paused():
+        await voice_client.resume()
+    else:
+        await ctx.send("The bot was not playing anything before this. Use play_song command")
+
+@client.command(name='stop', help='Stops the song')
+async def stop(ctx):
+    voice_client = ctx.message.guild.voice_client
+    if voice_client.is_playing():
+        await voice_client.stop()
+    else:
+        await ctx.send("The bot is not playing anything at the moment.")
+
+keep_alive()
 client.run(credentials.bot_token)
+

@@ -5,7 +5,8 @@ evil_responses = [
 ]
 
 happy_zarif_responses = [
-  "plus15sc.png"
+  "plus15sc.png",
+  "image_2_4.jpg"
 ]
 
 def evil_randomizer():
