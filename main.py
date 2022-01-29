@@ -90,10 +90,15 @@ async def on_message(message):
       await message.channel.send(f"Social Credit Balance {user.social_credit}")
       set_user(user)
   
-    if message.content.startswith("$kahesh "):
+    if message.content.startswith("$kahesh"):
       admin = get_admin(user)
       if admin:
+        embedVar = discord.Embed(title="List of users", description="Username", color=0x00ff00)
+        embedVar.add_field(name="Field1", value="hi", inline=False)
+        embedVar.add_field(name="Field2", value="hi2", inline=False)
+        await message.channel.send(embed=embedVar)
         args = message.content.split(' ')
+      
         target = get_user(args[1])
         if target:
           amount = args[2]
