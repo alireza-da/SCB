@@ -1,10 +1,12 @@
 import discord
 import credentials
-from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin
+from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables
+from precommands import run_pre_commands
 from discord.ext import commands
 from respond_randomizer import evil_randomizer, happy_zarif_randomizer
 from keep_alive import keep_alive
 from youtube import YTDLSource
+from music import Music
 
 intents = discord.Intents.all()
 intents.members = True
@@ -14,15 +16,18 @@ FFMPEG_OPTIONS = {}
 guild = None
 
 def get_all_members():
-    res = client.get_guild(869221659733807125).members
-    return res
+    res_mhkn = client.get_guild(869221659733807125).members
+    res_leg = client.get_guild(706038344450310215).members
+    return res_mhkn + res_leg
 
 
 @client.event
 async def on_ready():
     print(f"Logged In as {client.user}")
-    # del db["users"]
+    # delete_tables()
+    run_pre_commands()
     setup_tables(get_all_members())
+    client.add_cog(Music(client))
     
 
 
@@ -39,7 +44,7 @@ async def on_message(message):
           with open("assets/plus15sc.png", "rb") as SC15:
               plus_15_pic = discord.File(SC15)
               await message.channel.send(file=plus_15_pic)
-          print(f"[INFO]: Current Social Credit: {user.social_credit}")
+          # print(f"[INFO]: Current Social Credit: {user.social_credit}")
           # print(f"[INFO]: User Occurance: {get_user_occurance(user.id)}")
           user.increase_social_credit(15)
           await message.channel.send(f"Social Credit Balance {user.social_credit}")
@@ -90,20 +95,25 @@ async def on_message(message):
       await message.channel.send(f"Social Credit Balance {user.social_credit}")
       set_user(user)
   
-    if message.content.startswith("$kahesh"):
-      admin = get_admin(user)
-      if admin:
-        embedVar = discord.Embed(title="List of users", description="Username", color=0x00ff00)
-        embedVar.add_field(name="Field1", value="hi", inline=False)
-        embedVar.add_field(name="Field2", value="hi2", inline=False)
-        await message.channel.send(embed=embedVar)
-        args = message.content.split(' ')
+    if message.content.startswith("$decrease"):
+      try:
+        admin = get_admin(user)
+        if admin:
+          target = message.mentions[0]
+          amount = message.content.split(' ')[-1]
+          user = get_user(target.id)
+          if user:
+            embedVar = discord.Embed(title="Social Credit Transaction", description=f"{target.name}", color=0x00ff00)
+            embedVar.add_field(name="Amount", value=f"-{amount}", inline=False)
+            admin.reduce(user, int(amount))
+            set_user(user)
+            embedVar.add_field(name="Social Credit Balance", value=f"{user.social_credit}", inline=False)
+            await message.channel.send(embed=embedVar)
+        else:
+          await message.channel.send("You are not admin")
+      except Exception as e:
+        print(f"[Error]: {e}")
       
-        target = get_user(args[1])
-        if target:
-          amount = args[2]
-          admin.reduce(target, int(amount))
-        
     if message.content.startswith("$p "):
       await join(message)
 
@@ -113,7 +123,8 @@ async def on_message(message):
     if message.content.startswith("$play_yt "):
       await play_yt(ctx, message.content.split(' ')[1])
       
-  await client.process_commands(message)
+    else:
+      await client.process_commands(message)
 
 async def disconnect(message):
   channel = message.author.voice.channel
@@ -122,23 +133,47 @@ async def disconnect(message):
       print(f"[INFO]: Disconnecting from {channel.name}")
       vc = channel.guild.voice_client
       await vc.disconnect()
-    except:
-      pass
+    except Exception as e:
+      print(f"[Error]: {e}")
 
 
+@client.command(
+  name="increase"
+)
+async def increase_sc(ctx):
+  message = ctx.message
+  user = get_user(message.author.id)
+  admin = get_admin(user)
+  if admin:
+    target = message.mentions[0]
+    amount = message.content.split(' ')[-1]
+    user = get_user(target.id)
+    if user:
+      embedVar = discord.Embed(title="Social Credit Transaction", description=f"{target.name}", color=0x00ff00)
+      embedVar.add_field(name="Amount", value=f"+{amount}", inline=False)
+      admin.increase(user, int(amount))
+      set_user(user)
+      embedVar.add_field(name="Social Credit Balance", value=f"{user.social_credit}", inline=False)
+      await message.channel.send(embed=embedVar)
+  else:
+    await message.channel.send("You are not admin")
 
 @client.event
 async def join(message):
+  # print(f"[INFO]: Joining {channel}")
   channel = message.author.voice.channel
-  print(f"[INFO]: Joining {channel}")
+  try:
+    await channel.connect()
+  except Exception as e:
+    print(f"[Error]: {e}")
   if "bing" in message.content.split(' ') and "chilling" in message.content.split(' '):
     return await play_binchilin(message)
+    
   if "zarif" in message.content.split(' '):
     return await p_zarif(message)
   else:
     return await play_yt(await client.get_context(message), message.content.split(' ')[1])
   return await channel.connect()
-
 
 async def play_binchilin(message):
   user = message.author
@@ -147,9 +182,8 @@ async def play_binchilin(message):
     vc = voice_channel.guild.voice_client
     try:
       vc = await voice_channel.connect()
-      
-    except:
-      pass
+    except Exception as e:
+      print(f"[Error]: {e}")
     source = discord.FFmpegPCMAudio("assets/john_cena_eats_bing_chilling_in_1080p_cc_2520698433256124212.m4a", **FFMPEG_OPTIONS)
     vc.play(source)
   else:
@@ -157,15 +191,14 @@ async def play_binchilin(message):
 
 @client.command(name="p_zarif")
 async def p_zarif(message):
-  user= message.author
+  user = message.author
   voice_channel= user.voice.channel
   if voice_channel != None:
     vc = voice_channel.guild.voice_client
     try:
       vc = await voice_channel.connect()
-      
     except:
-      pass
+      print(f"Cannot connect to {voice_channel}")
     source = discord.FFmpegPCMAudio("assets/zarif talking chinies.m4a", **FFMPEG_OPTIONS)
     vc.play(source)
   else:
@@ -183,44 +216,43 @@ async def play_yt(ctx,url):
   try :
       user = ctx.message.author
       voice_channel = user.voice.channel
-      print(voice_channel)
       if voice_channel != None:
         vc = voice_channel.guild.voice_client
         try:
           vc = await voice_channel.connect()
         except:
+          print(f"Cannot connect to {voice_channel}")
           await ctx.send("The bot is already connected to a voice channel.")
         filename = await YTDLSource.from_url(url, loop=client.loop)
         vc.play(discord.FFmpegPCMAudio(source=filename))
         await ctx.send('**Now playing:** {}'.format(filename))          
-  except:
-    pass
-    # await ctx.send("The bot is not connected to a voice channel.")
+  except Exception as e:
+    print(f"[Error]: {e}")
 
-@client.command(name='pause', help='This command pauses the song')
-async def pause(ctx):
-    voice_client = ctx.message.guild.voice_client
-    if voice_client.is_playing():
-      await ctx.send("paused")
-      await voice_client.pause()
-    else:
-      await ctx.send("The bot is not playing anything at the moment.")
+# @client.command(name='pause', help='This command pauses the song')
+# async def pause(ctx):
+#     voice_client = ctx.message.guild.voice_client
+#     if voice_client.is_playing():
+#       await ctx.send("paused")
+#       await voice_client.pause()
+#     else:
+#       await ctx.send("The bot is not playing anything at the moment.")
     
-@client.command(name='resume', help='Resumes the song')
-async def resume(ctx):
-    voice_client = ctx.message.guild.voice_client
-    if voice_client.is_paused():
-        await voice_client.resume()
-    else:
-        await ctx.send("The bot was not playing anything before this. Use play_song command")
+# @client.command(name='resume', help='Resumes the song')
+# async def resume(ctx):
+#     voice_client = ctx.message.guild.voice_client
+#     if voice_client.is_paused():
+#         await voice_client.resume()
+#     else:
+#         await ctx.send("The bot was not playing anything before this. Use play_song command")
 
-@client.command(name='stop', help='Stops the song')
-async def stop(ctx):
-    voice_client = ctx.message.guild.voice_client
-    if voice_client.is_playing():
-        await voice_client.stop()
-    else:
-        await ctx.send("The bot is not playing anything at the moment.")
+# @client.command(name='stop', help='Stops the song')
+# async def stop(ctx):
+#     voice_client = ctx.message.guild.voice_client
+#     if voice_client.is_playing():
+#         await voice_client.stop()
+#     else:
+#         await ctx.send("The bot is not playing anything at the moment.")
 
 keep_alive()
 client.run(credentials.bot_token)

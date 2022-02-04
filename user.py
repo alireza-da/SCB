@@ -19,8 +19,9 @@ class User:
 
 
 class Admin(User):
+  @staticmethod
   def reduce(user, amount):
     user.decrease_social_credit(amount)
-
+  @staticmethod
   def increase(user, amount):
     user.increase_social_credit(amount)
