@@ -1,5 +1,6 @@
 import discord
 import credentials
+import os
 from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables
 from precommands import run_pre_commands
 from discord.ext import commands
@@ -161,6 +162,11 @@ async def increase_sc(ctx):
 @client.event
 async def join(message):
   # print(f"[INFO]: Joining {channel}")
+  try:
+    # await run_pre_commands()
+    os.system("pip3 install pynacl")
+  except Exception as e:
+    print(e)
   channel = message.author.voice.channel
   try:
     await channel.connect()
@@ -222,7 +228,7 @@ async def play_yt(ctx,url):
           vc = await voice_channel.connect()
         except:
           print(f"Cannot connect to {voice_channel}")
-          await ctx.send("The bot is already connected to a voice channel.")
+          # await ctx.send("The bot is already connected to a voice channel.")
         filename = await YTDLSource.from_url(url, loop=client.loop)
         vc.play(discord.FFmpegPCMAudio(source=filename))
         await ctx.send('**Now playing:** {}'.format(filename))          
