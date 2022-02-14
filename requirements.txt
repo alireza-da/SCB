@@ -4,6 +4,7 @@ attrs==21.4.0
 chardet==4.0.0
 discord==1.7.3
 discord.py==1.7.3
+flask
 gunicorn==20.1.0
 idna==3.3
 multidict==6.0.2
