@@ -1,8 +1,9 @@
 import discord
 import credentials
 import os
-from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables
+
 from precommands import run_pre_commands
+from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables
 from discord.ext import commands
 from respond_randomizer import evil_randomizer, happy_zarif_randomizer
 from keep_alive import keep_alive
@@ -27,7 +28,7 @@ def get_all_members():
 async def on_ready():
     print(f"Logged In as {client.user}")
     # delete_tables()
-    # run_pre_commands()
+    run_pre_commands()
     setup_tables(get_all_members())
     client.add_cog(Music(client))
 
@@ -191,7 +192,7 @@ async def join(message):
 async def play_binchilin(message):
     user = message.author
     voice_channel = user.voice.channel
-    if voice_channel != None:
+    if voice_channel is not None:
         vc = voice_channel.guild.voice_client
         try:
             vc = await voice_channel.connect()
@@ -208,12 +209,13 @@ async def play_binchilin(message):
 async def p_zarif(message):
     user = message.author
     voice_channel = user.voice.channel
-    if voice_channel != None:
+    if voice_channel is not None:
         vc = voice_channel.guild.voice_client
         try:
             vc = await voice_channel.connect()
-        except:
+        except Exception as e:
             print(f"Cannot connect to {voice_channel}")
+            print(f"[Error][main.py:217]: ")
         source = discord.FFmpegPCMAudio("assets/zarif talking chinies.m4a", **FFMPEG_OPTIONS)
         vc.play(source)
     else:
@@ -233,7 +235,7 @@ async def play_yt(ctx, url):
     try:
         user = ctx.message.author
         voice_channel = user.voice.channel
-        if voice_channel != None:
+        if voice_channel is not None:
             vc = voice_channel.guild.voice_client
             try:
                 vc = await voice_channel.connect()
