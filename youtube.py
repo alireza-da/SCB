@@ -15,7 +15,7 @@ ytdl_format_options = {
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
-    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
+    'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 
 ffmpegopts = {
@@ -24,6 +24,7 @@ ffmpegopts = {
 }
 
 ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+
 
 class YTDLSource(discord.PCMVolumeTransformer):
     def __init__(self, source, *, data, requester):
@@ -36,13 +37,13 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         # YTDL info dicts (data) have other useful information you might want
         # https://github.com/rg3/youtube-dl/blob/master/README.md
+
     def __getitem__(self, item: str):
         """Allows us to access attributes similar to a dict.
         This is only useful when you are NOT downloading.
         """
         return self.__getattribute__(item)
 
-    
     @classmethod
     async def create_source(cls, ctx, search: str, *, loop, download=False):
         loop = loop or asyncio.get_event_loop()
@@ -54,7 +55,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
             # take first item from a playlist
             data = data['entries'][0]
 
-        embed = discord.Embed(title="", description=f"Queued [{data['title']}]({data['webpage_url']}) [{ctx.author.mention}]", color=discord.Color.green())
+        embed = discord.Embed(title="",
+                              description=f"Queued [{data['title']}]({data['webpage_url']}) [{ctx.author.mention}]",
+                              color=discord.Color.green())
         await ctx.send(embed=embed)
 
         if download:
@@ -63,7 +66,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
             return {'webpage_url': data['webpage_url'], 'requester': ctx.author, 'title': data['title']}
 
         return cls(discord.FFmpegPCMAudio(source), data=data, requester=ctx.author)
-
 
     @classmethod
     async def regather_stream(cls, data, *, loop):
