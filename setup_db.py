@@ -1,6 +1,8 @@
 from user import User, Admin
 import json
 
+db = dict()
+
 admins_id = [665530648789909504, 583223852641812499]
 
 
