@@ -1,6 +1,6 @@
 import discord
 import credentials
-import os
+import logging
 
 from precommands import run_pre_commands
 from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables
@@ -80,7 +80,7 @@ async def on_message(message):
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
             set_user(user)
 
-        if "salam" in message.content.lower() or "سلام" in message.content or "hi" in message.content.lower() or\
+        if "salam" in message.content.lower() or "سلام" in message.content or "hi" in message.content.lower() or \
                 "hello" in message.content.lower():
             await message.channel.send(f"{user.username}, salam bar shoma shahrvand aziz, +15 Social credit")
             user.increase_social_credit(15)
@@ -168,12 +168,6 @@ async def increase_sc(ctx):
 
 @client.event
 async def join(message):
-    # print(f"[INFO]: Joining {channel}")
-    try:
-        # await run_pre_commands()
-        os.system("pip3 install pynacl")
-    except Exception as e:
-        print(e)
     channel = message.author.voice.channel
     try:
         await channel.connect()
@@ -182,11 +176,10 @@ async def join(message):
     if "bing" in message.content.split(' ') and "chilling" in message.content.split(' '):
         return await play_binchilin(message)
 
-    if "zarif" in message.content.split(' '):
+    elif "zarif" in message.content.split(' '):
         return await p_zarif(message)
     else:
         return await play_yt(await client.get_context(message), message.content.split(' ')[1])
-    return await channel.connect()
 
 
 async def play_binchilin(message):
@@ -239,12 +232,17 @@ async def play_yt(ctx, url):
             vc = voice_channel.guild.voice_client
             try:
                 vc = await voice_channel.connect()
-            except:
+            except Exception as e:
                 print(f"Cannot connect to {voice_channel}")
+                print(f"[Error]: {e}")
                 # await ctx.send("The bot is already connected to a voice channel.")
-            filename = await YTDLSource.from_url(url, loop=client.loop)
-            vc.play(discord.FFmpegPCMAudio(source=filename))
-            await ctx.send('**Now playing:** {}'.format(filename))
+            try:
+                filename = await YTDLSource.from_url(url, loop=client.loop)
+                vc.play(discord.FFmpegPCMAudio(source=filename))
+                await ctx.send('**Now playing:** {}'.format(filename))
+            except Exception as e:
+                logging.error(f"{e}")
+
     except Exception as e:
         print(f"[Error]: {e}")
 
