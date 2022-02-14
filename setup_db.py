@@ -1,5 +1,6 @@
 from user import User, Admin
 import json
+import psycopg2
 
 db = dict()
 
