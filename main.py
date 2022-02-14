@@ -27,7 +27,7 @@ def get_all_members():
 async def on_ready():
     print(f"Logged In as {client.user}")
     # delete_tables()
-    run_pre_commands()
+    # run_pre_commands()
     setup_tables(get_all_members())
     client.add_cog(Music(client))
 
@@ -79,7 +79,8 @@ async def on_message(message):
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
             set_user(user)
 
-        if "salam" in message.content.lower() or "سلام" in message.content or "hi" in message.content.lower() or "hello" in message.content.lower():
+        if "salam" in message.content.lower() or "سلام" in message.content or "hi" in message.content.lower() or\
+                "hello" in message.content.lower():
             await message.channel.send(f"{user.username}, salam bar shoma shahrvand aziz, +15 Social credit")
             user.increase_social_credit(15)
             with open(f"assets/{happy_zarif_randomizer()}", "rb") as SC15:
