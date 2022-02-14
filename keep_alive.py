@@ -16,8 +16,8 @@ def show_bot_name():
 
 
 def run():
-    print(f"[INFO]: App is Up on port {port}")
-    app.run(host='0.0.0.0', port=8080)
+    print(f"[INFO]: App is up on port {port}")
+    app.run(host='0.0.0.0', port=port)
 
 
 def keep_alive():
