@@ -168,7 +168,7 @@ class Music(commands.Cog):
                 await channel.connect()
             except asyncio.TimeoutError:
                 raise VoiceConnectionError(f'Connecting to channel: <{channel}> timed out.')
-        if (random.randint(0, 1) == 0):
+        if random.randint(0, 1) == 0:
             await ctx.message.add_reaction('👍')
         await ctx.send(f'**Joined `{channel}`**')
 
@@ -257,7 +257,7 @@ class Music(commands.Cog):
             return await ctx.send(embed=embed)
 
         player = self.get_player(ctx)
-        if pos == None:
+        if pos is None:
             player.queue._queue.pop()
         else:
             try:
@@ -405,7 +405,7 @@ class Music(commands.Cog):
                                   color=discord.Color.green())
             return await ctx.send(embed=embed)
 
-        if (random.randint(0, 1) == 0):
+        if random.randint(0, 1) == 0:
             await ctx.message.add_reaction('👋')
         await ctx.send('**Successfully disconnected**')
 

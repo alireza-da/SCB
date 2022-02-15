@@ -14,14 +14,14 @@ class User:
 
     @staticmethod
     def user_decoder(obj):
-      return User(obj['username'], obj['social_credit'], obj['level'], obj['id'])
-
+        return User(obj['username'], obj['social_credit'], obj['level'], obj['id'])
 
 
 class Admin(User):
-  @staticmethod
-  def reduce(user, amount):
-    user.decrease_social_credit(amount)
-  @staticmethod
-  def increase(user, amount):
-    user.increase_social_credit(amount)
+    @staticmethod
+    def reduce(user, amount):
+        user.decrease_social_credit(amount)
+
+    @staticmethod
+    def increase(user, amount):
+        user.increase_social_credit(amount)

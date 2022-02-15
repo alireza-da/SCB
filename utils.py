@@ -1,5 +1,6 @@
 import queue
 
+
 class ClearQueue(queue.Queue):
     def clear(self):
         try:

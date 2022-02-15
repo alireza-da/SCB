@@ -93,6 +93,5 @@ def delete_db():
     del db["users"]
 
 
-
 def create_connection():
-  pass
+    pass

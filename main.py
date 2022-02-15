@@ -16,6 +16,7 @@ client = commands.Bot(command_prefix='$', intents=intents)
 # bot = commands.Bot(command_prefix='$',intents=intents)
 FFMPEG_OPTIONS = {}
 guild = None
+logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
 
 def get_all_members():
@@ -80,8 +81,8 @@ async def on_message(message):
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
             set_user(user)
 
-        if "salam" in message.content.lower() or "سلام" in message.content or "hi" in message.content.lower() or \
-                "hello" in message.content.lower():
+        if ("salam" in message.content.lower() or "سلام" in message.content) or ("hi" in message.content.lower() or
+                                                                                 "hello" in message.content.lower()):
             await message.channel.send(f"{user.username}, salam bar shoma shahrvand aziz, +15 Social credit")
             user.increase_social_credit(15)
             with open(f"assets/{happy_zarif_randomizer()}", "rb") as SC15:
@@ -208,7 +209,7 @@ async def p_zarif(message):
             vc = await voice_channel.connect()
         except Exception as e:
             print(f"Cannot connect to {voice_channel}")
-            print(f"[Error][main.py:217]: ")
+            logging.error(f"{e}")
         source = discord.FFmpegPCMAudio("assets/zarif talking chinies.m4a", **FFMPEG_OPTIONS)
         vc.play(source)
     else:
