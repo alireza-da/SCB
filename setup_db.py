@@ -4,6 +4,9 @@ import json
 import psycopg2
 import logging
 
+logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+logger = logging.getLogger(__name__)
+
 db = dict()
 
 admins_id = [665530648789909504, 583223852641812499]
@@ -25,13 +28,17 @@ def add_admins(list_users):
             db["admins"].append(json.dumps(_user.__dict__))
 
 
-def setup_tables(list_users):
+def setup_tables(cursor, list_users):
     # print(f"[INFO]: user detail: {[user for user in list_users]}" )
-    if "users" not in db.keys():
-        db["users"] = []
-        add_users_to_db(list_users)
-        db["admins"] = []
-        add_admins(list_users)
+    # if "users" not in db.keys():
+    #     db["users"] = []
+    #     add_users_to_db(list_users)
+    #     db["admins"] = []
+    #     add_admins(list_users)
+    cursor.execute("""SELECT table_name FROM information_schema.tables
+           WHERE table_schema = 'public'""")
+    for table in cursor.fetchall():
+        print(table)
 
 
 def delete_tables():
@@ -96,10 +103,11 @@ def delete_db():
 
 
 def create_connection():
+
     try:
         con = psycopg2.connect(db_url)
-        logging.info(f"[INFO]: Connected to DB {con}")
+        logger.info(f"[INFO]: Connected to DB {con}")
         return con.cursor()
     except Exception as e:
-        logging.error(f"{e}")
+        logger.error(f"{e}")
 

@@ -17,6 +17,7 @@ client = commands.Bot(command_prefix='$', intents=intents)
 FFMPEG_OPTIONS = {}
 guild = None
 logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+logger = logging.getLogger(__name__)
 
 
 def get_all_members():
@@ -29,9 +30,9 @@ def get_all_members():
 async def on_ready():
     print(f"Logged In as {client.user}")
     # delete_tables()
-    create_connection()
     run_pre_commands()
-    setup_tables(get_all_members())
+    cursor = create_connection()
+    setup_tables(cursor, get_all_members())
     client.add_cog(Music(client))
 
 
