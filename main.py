@@ -2,6 +2,7 @@ import discord
 import credentials
 import logging
 
+logger = logging.getLogger(__name__)
 from precommands import run_pre_commands
 from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables, create_connection
 from discord.ext import commands
@@ -16,8 +17,9 @@ client = commands.Bot(command_prefix='$', intents=intents)
 # bot = commands.Bot(command_prefix='$',intents=intents)
 FFMPEG_OPTIONS = {}
 guild = None
-logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
-logger = logging.getLogger(__name__)
+
+
+# logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
 
 def get_all_members():
@@ -31,8 +33,8 @@ async def on_ready():
     print(f"Logged In as {client.user}")
     # delete_tables()
     run_pre_commands()
-    cursor = create_connection()
-    setup_tables(cursor, get_all_members())
+    # create_connection()
+    setup_tables(get_all_members())
     client.add_cog(Music(client))
 
 

@@ -28,17 +28,40 @@ def add_admins(list_users):
             db["admins"].append(json.dumps(_user.__dict__))
 
 
-def setup_tables(cursor, list_users):
+def setup_tables(list_users):
     # print(f"[INFO]: user detail: {[user for user in list_users]}" )
-    # if "users" not in db.keys():
-    #     db["users"] = []
-    #     add_users_to_db(list_users)
-    #     db["admins"] = []
-    #     add_admins(list_users)
-    cursor.execute("""SELECT table_name FROM information_schema.tables
-           WHERE table_schema = 'public'""")
-    for table in cursor.fetchall():
-        print(table)
+    con, cursor = create_connection()
+    if "users" not in db.keys():
+        db["users"] = []
+        add_users_to_db(list_users)
+        db["admins"] = []
+        add_admins(list_users)
+    try:
+        cursor.execute("""SELECT table_name FROM information_schema.tables
+               """)
+        tables = cursor.fetchall()
+        if ("users",) not in tables:
+            print("[INFO]: Creating Tables")
+            cursor.execute(
+                """CREATE TABLE users (
+                    username VARCHAR(255),
+                    social_credits INTEGER,
+                    id INTEGER PRIMARY KEY,
+                    level INTEGER
+                )""")
+        if ("admins", ) not in tables:
+            cursor.execute(
+                """CREATE TABLE admins (
+                    username VARCHAR(255),
+                    social_credits INTEGER,
+                    id INTEGER PRIMARY KEY,
+                    level INTEGER
+                )""")
+        cursor.close()
+        con.commit()
+
+    except Exception as e:
+        print(e)
 
 
 def delete_tables():
@@ -49,7 +72,7 @@ def delete_tables():
 def get_user(id):
     users = db["users"]
     for user in users:
-        print(f"[INFO]: Retreiving user : {user}")
+        print(f"[INFO]: Retrieving user : {user}")
         _user = User.user_decoder(json.loads(user))
         print(f"[INFO]: Decode user to :{_user}")
         if _user.id == id:
@@ -103,11 +126,9 @@ def delete_db():
 
 
 def create_connection():
-
     try:
         con = psycopg2.connect(db_url)
         logger.info(f"[INFO]: Connected to DB {con}")
-        return con.cursor()
+        return con, con.cursor()
     except Exception as e:
         logger.error(f"{e}")
-
