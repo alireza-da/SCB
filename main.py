@@ -3,7 +3,7 @@ import credentials
 import logging
 
 from precommands import run_pre_commands
-from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables
+from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables, create_connection
 from discord.ext import commands
 from respond_randomizer import evil_randomizer, happy_zarif_randomizer
 from keep_alive import keep_alive
@@ -29,6 +29,7 @@ def get_all_members():
 async def on_ready():
     print(f"Logged In as {client.user}")
     # delete_tables()
+    create_connection()
     run_pre_commands()
     setup_tables(get_all_members())
     client.add_cog(Music(client))

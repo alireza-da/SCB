@@ -1,6 +1,8 @@
 from user import User, Admin
+from credentials import db_url
 import json
 import psycopg2
+import logging
 
 db = dict()
 
@@ -94,4 +96,10 @@ def delete_db():
 
 
 def create_connection():
-    pass
+    try:
+        con = psycopg2.connect(db_url)
+        logging.info(f"[INFO]: Connected to DB {con}")
+        return con.cursor()
+    except Exception as e:
+        logging.error(f"{e}")
+
