@@ -33,7 +33,7 @@ async def on_ready():
     print(f"Logged In as {client.user}")
     # delete_tables()
     run_pre_commands()
-    setup_tables(get_all_members())
+    # setup_tables(get_all_members())
     client.add_cog(Music(client))
 
 
