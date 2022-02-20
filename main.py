@@ -33,7 +33,6 @@ async def on_ready():
     print(f"Logged In as {client.user}")
     # delete_tables()
     run_pre_commands()
-    # create_connection()
     setup_tables(get_all_members())
     client.add_cog(Music(client))
 
@@ -85,15 +84,15 @@ async def on_message(message):
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
             set_user(user)
 
-        if ("salam" in message.content.lower() or "سلام" in message.content) or ("hi" in message.content.lower() or
-                                                                                 "hello" in message.content.lower()):
-            await message.channel.send(f"{user.username}, salam bar shoma shahrvand aziz, +15 Social credit")
-            user.increase_social_credit(15)
-            with open(f"assets/{happy_zarif_randomizer()}", "rb") as SC15:
-                plus_15_pic = discord.File(SC15)
-                await message.channel.send(file=plus_15_pic)
-            await message.channel.send(f"Social Credit Balance {user.social_credit}")
-            set_user(user)
+        # if ("salam" in message.content.lower() or "سلام" in message.content) or ("hi" in message.content.lower() or
+        #                                                                          "hello" in message.content.lower()):
+        #     await message.channel.send(f"{user.username}, salam bar shoma shahrvand aziz, +15 Social credit")
+        #     user.increase_social_credit(15)
+        #     with open(f"assets/{happy_zarif_randomizer()}", "rb") as SC15:
+        #         plus_15_pic = discord.File(SC15)
+        #         await message.channel.send(file=plus_15_pic)
+        #     await message.channel.send(f"Social Credit Balance {user.social_credit}")
+        #     set_user(user)
 
         if "dota" in message.content.lower() or "dota2" in message.content.lower() or "dota 2" in message.content.lower() or "دوتا" in message.content or "دوتا2" in message.content:
             await message.channel.send(
