@@ -62,11 +62,6 @@ def add_admins(list_users):
 def setup_tables(list_users):
     # print(f"[INFO]: user detail: {[user for user in list_users]}")
     con, cursor = create_connection()
-    if "users" not in db.keys():
-        db["users"] = []
-        # add_users_to_db(list_users)
-        db["admins"] = []
-        # add_admins(list_users)
     try:
         cursor.execute("""SELECT table_name FROM information_schema.tables
                """)
