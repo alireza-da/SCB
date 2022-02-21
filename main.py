@@ -39,7 +39,7 @@ def get_all_members():
 async def on_ready():
     print(f"Logged In as {client.user}")
     # delete_tables()
-    run_pre_commands()
+    # run_pre_commands()
     # setup_tables(get_all_members())
     await non_blocking_data_insertion(setup_tables, get_all_members())
     client.add_cog(Music(client))
