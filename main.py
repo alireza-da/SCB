@@ -1,3 +1,6 @@
+import functools
+import typing
+
 import discord
 import credentials
 import logging
@@ -21,6 +24,10 @@ guild = None
 
 # logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
+async def non_blocking_data_insertion(blocking_func: typing.Callable, *args, **kwargs) -> typing.Any:
+    func = functools.partial(blocking_func, *args, **kwargs)
+    return await client.loop.run_in_executor(None, func)
+
 
 def get_all_members():
     res_mhkn = client.get_guild(869221659733807125).members
@@ -34,6 +41,7 @@ async def on_ready():
     # delete_tables()
     run_pre_commands()
     # setup_tables(get_all_members())
+    await non_blocking_data_insertion(setup_tables, get_all_members())
     client.add_cog(Music(client))
 
 

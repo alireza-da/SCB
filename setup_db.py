@@ -3,6 +3,8 @@ from credentials import db_url
 import json
 import psycopg2
 import logging
+import typing
+import functools
 
 logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
 logger = logging.getLogger(__name__)
@@ -25,6 +27,7 @@ def add_users_to_db(list_users):
             users.append(json.dumps(_user.__dict__))
     cursor.close()
     con.commit()
+    print_tables()
 
 
 def add_admins(list_users):
@@ -62,6 +65,7 @@ def setup_tables(list_users):
                     id BIGINT PRIMARY KEY,
                     level INTEGER
                 )""")
+
         if ("admins",) not in tables:
             cursor.execute(
                 """CREATE TABLE admins (
@@ -72,9 +76,20 @@ def setup_tables(list_users):
                 )""")
         cursor.close()
         con.commit()
+        add_users_to_db(list_users)
+        add_admins(list_users)
 
     except Exception as e:
         print(e)
+
+
+def print_tables():
+    con, cursor = create_connection()
+    cursor.execute("SELECT * FROM users")
+    result = cursor.fetchall()
+    print(result)
+    cursor.close()
+    con.commit()
 
 
 def delete_tables():
