@@ -116,14 +116,21 @@ def delete_tables():
 
 
 def get_user(id):
-    users = db["users"]
-    for user in users:
+    user_ret = "SELECT * FROM users WHERE id = %s"
+    con, cursor = create_connection()
+    try:
+        cursor.execute(user_ret, id)
+        _user = cursor.fetchall()
+        print(_user)
+        user = User.user_decoder(json.loads(_user))
         print(f"[INFO]: Retrieving user : {user}")
-        _user = User.user_decoder(json.loads(user))
-        print(f"[INFO]: Decode user to :{_user}")
-        if _user.id == id:
-            return _user
-    return None
+        con.commit()
+        cursor.close()
+        con.close()
+        return user
+
+    except Exception as e:
+        return None
 
 
 def get_user_id(id):
@@ -154,6 +161,20 @@ def set_user(user):
     del db["users"][get_user_id(user.id)]
     print("[INFO]: Saving user: " + d)
     db["users"].append(d)
+
+
+def update_user(user):
+    update_query = "UPDATE users SET username = %s, %s, %s, %s WHERE id = %s"
+    con, cursor = create_connection()
+    try:
+        print(f"[INFO]: Saving user: {user.name}")
+        cursor.execute(update_query, (user.name, user.social_credit, user.id, user.level, user.id))
+        cursor.fetchall()
+        con.commit()
+        cursor.close()
+        con.close()
+    except Exception as e:
+        print(e)
 
 
 def get_admin(user):

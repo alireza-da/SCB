@@ -7,7 +7,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 from precommands import run_pre_commands
-from setup_db import setup_tables, get_user, set_user, get_user_occurance, get_admin, delete_tables, create_connection
+from setup_db import setup_tables, get_user, update_user, get_user_occurance, get_admin, delete_tables, create_connection
 from discord.ext import commands
 from respond_randomizer import evil_randomizer, happy_zarif_randomizer
 from keep_alive import keep_alive
@@ -63,7 +63,7 @@ async def on_message(message):
             # print(f"[INFO]: User Occurance: {get_user_occurance(user.id)}")
             user.increase_social_credit(15)
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
-            set_user(user)
+            update_user(user)
 
         if "feshar" in message.content.lower() or "فشار" in message.content:
             await message.channel.send(f"{user.username}, Feshar estefade kardi,-30 social credit")
@@ -72,7 +72,7 @@ async def on_message(message):
                 await message.channel.send(file=minus_30_pic)
             user.decrease_social_credit(30)
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
-            set_user(user)
+            update_user(user)
 
         if "kir" in message.content.lower() or "کیر" in message.content:
             await message.channel.send(f"{user.username}, mohtavaye na monaseb, -300 social credit")
@@ -81,7 +81,7 @@ async def on_message(message):
                 await message.channel.send(file=minus_30_pic)
             user.decrease_social_credit(300)
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
-            set_user(user)
+            update_user(user)
 
         if "marg bar amrica" in message.content.lower() or "مرگ بر آمریکا" in message.content:
             await message.channel.send(f"{user.username}, kare basiji anjam dadi +15 Social credit")
@@ -90,7 +90,7 @@ async def on_message(message):
                 plus_15_pic = discord.File(SC15)
                 await message.channel.send(file=plus_15_pic)
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
-            set_user(user)
+            update_user(user)
 
         # if ("salam" in message.content.lower() or "سلام" in message.content) or ("hi" in message.content.lower() or
         #                                                                          "hello" in message.content.lower()):
@@ -100,7 +100,7 @@ async def on_message(message):
         #         plus_15_pic = discord.File(SC15)
         #         await message.channel.send(file=plus_15_pic)
         #     await message.channel.send(f"Social Credit Balance {user.social_credit}")
-        #     set_user(user)
+        #     update_user(user)
 
         if "dota" in message.content.lower() or "dota2" in message.content.lower() or "dota 2" in message.content.lower() or "دوتا" in message.content or "دوتا2" in message.content:
             await message.channel.send(
@@ -110,7 +110,7 @@ async def on_message(message):
                 await message.channel.send(file=minus_30_pic)
             user.decrease_social_credit(30)
             await message.channel.send(f"Social Credit Balance {user.social_credit}")
-            set_user(user)
+            update_user(user)
 
         if message.content.startswith("$decrease"):
             try:
@@ -124,7 +124,7 @@ async def on_message(message):
                                                  color=0x00ff00)
                         embedVar.add_field(name="Amount", value=f"-{amount}", inline=False)
                         admin.reduce(user, int(amount))
-                        set_user(user)
+                        update_user(user)
                         embedVar.add_field(name="Social Credit Balance", value=f"{user.social_credit}", inline=False)
                         await message.channel.send(embed=embedVar)
                 else:
@@ -171,7 +171,7 @@ async def increase_sc(ctx):
             embedVar = discord.Embed(title="Social Credit Transaction", description=f"{target.name}", color=0x00ff00)
             embedVar.add_field(name="Amount", value=f"+{amount}", inline=False)
             admin.increase(user, int(amount))
-            set_user(user)
+            update_user(user)
             embedVar.add_field(name="Social Credit Balance", value=f"{user.social_credit}", inline=False)
             await message.channel.send(embed=embedVar)
     else:
