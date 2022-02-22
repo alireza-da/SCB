@@ -5,7 +5,6 @@ import discord
 import credentials
 import logging
 
-logger = logging.getLogger(__name__)
 from precommands import run_pre_commands
 from setup_db import setup_tables, get_user, update_user, get_user_occurance, get_admin, delete_tables, create_connection
 from discord.ext import commands
@@ -14,6 +13,7 @@ from keep_alive import keep_alive
 from youtube import YTDLSource
 from music import Music
 
+logger = logging.getLogger(__name__)
 intents = discord.Intents.all()
 intents.members = True
 client = commands.Bot(command_prefix='$', intents=intents)

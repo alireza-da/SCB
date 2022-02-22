@@ -91,7 +91,7 @@ def setup_tables(list_users):
         add_users_to_db(list_users)
         add_admins(list_users)
     except Exception as e:
-        print(e)
+        print(f"[Error]: {e}")
     # print_tables()
 
 
@@ -114,17 +114,19 @@ def get_user(id):
     user_ret = "SELECT * FROM users WHERE id = %s"
     con, cursor = create_connection()
     try:
-        cursor.execute(user_ret, id)
+
+        cursor.execute(user_ret, (id,))
         _user = cursor.fetchall()
-        print(_user)
-        user = User.user_decoder(json.loads(_user))
-        print(f"[INFO]: Retrieving user : {user}")
+        print(f"[INFO]: Retrieving database user : {_user[0]}")
+        user = User.user_decoder_static(_user[0])
+        # print(f"[INFO]: Retrieving object user : {user}")
         con.commit()
         cursor.close()
         con.close()
         return user
 
     except Exception as e:
+        print(f"[Error]: {e}")
         return None
 
 

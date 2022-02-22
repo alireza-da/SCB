@@ -16,6 +16,10 @@ class User:
     def user_decoder(obj):
         return User(obj['username'], obj['social_credit'], obj['level'], obj['id'])
 
+    @staticmethod
+    def user_decoder_static(query_res):
+        return User(query_res[0], query_res[1], query_res[3], query_res[2])
+
 
 class Admin(User):
     @staticmethod
