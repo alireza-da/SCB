@@ -117,7 +117,7 @@ def get_user(id):
 
         cursor.execute(user_ret, (id,))
         _user = cursor.fetchall()
-        print(f"[INFO]: Retrieving database user : {_user[0]}")
+        # print(f"[INFO]: Retrieving database user : {_user[0]}")
         user = User.user_decoder_static(_user[0])
         # print(f"[INFO]: Retrieving object user : {user}")
         con.commit()
