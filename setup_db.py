@@ -134,9 +134,7 @@ def get_user_id(id):
     users = db["users"]
     index = 0
     for user in users:
-
         _user = User.user_decoder(json.loads(user))
-
         if _user.id == id:
             return index
         index += 1
