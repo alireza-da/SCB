@@ -173,14 +173,21 @@ def update_user(user):
 
 
 def get_admin(user):
-    for admin in db["admins"]:
-        _user = user
-        print(type(user))
-        admin = User.user_decoder(json.loads(admin))
-        if admin.id == _user.id:
-            _user = Admin(_user.username, _user.social_credit, _user.level, _user.id)
-            return _user
-    return None
+    admin_ret = "SELECT * FROM admin WHERE id = %s"
+    con, cursor = create_connection()
+    try:
+        cursor.execute(admin_ret, (user.id,))
+        _user = cursor.fetchall()
+        print(f"[INFO]: Retrieving database admin : {_user[0]}")
+        user = User.user_decoder_static(_user[0])
+        print(f"[INFO]: Retrieving object admin : {user}")
+        con.commit()
+        cursor.close()
+        con.close()
+        return user
+    except Exception as e:
+        print(f"[Error]: {e}")
+        return None
 
 
 def delete_db():
