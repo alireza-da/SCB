@@ -29,3 +29,7 @@ class Admin(User):
     @staticmethod
     def increase(user, amount):
         user.increase_social_credit(amount)
+
+    @staticmethod
+    def user_decoder_static(query_res):
+        return Admin(query_res[0], query_res[1], query_res[3], query_res[2])

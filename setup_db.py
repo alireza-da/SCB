@@ -159,32 +159,31 @@ def set_user(user):
 
 
 def update_user(user):
-    update_query = "UPDATE users SET username = %s, %s, %s, %s WHERE id = %s"
+    update_query = "UPDATE users SET username = %s, social_credits = %s, id = %s, level = %s WHERE id = %s"
     con, cursor = create_connection()
     try:
-        print(f"[INFO]: Saving user: {user.name}")
-        cursor.execute(update_query, (user.name, user.social_credit, user.id, user.level, user.id))
-        cursor.fetchall()
+        print(f"[INFO]: Saving user: {user.username}")
+        cursor.execute(update_query, (user.username, user.social_credit, user.id, user.level, user.id))
         con.commit()
         cursor.close()
         con.close()
     except Exception as e:
-        print(e)
+        print(f"[Error][setup_db.py]: {e}")
 
 
 def get_admin(user):
-    admin_ret = "SELECT * FROM admin WHERE id = %s"
+    admin_ret = "SELECT * FROM admins WHERE id = %s"
     con, cursor = create_connection()
     try:
         cursor.execute(admin_ret, (user.id,))
         _user = cursor.fetchall()
         print(f"[INFO]: Retrieving database admin : {_user[0]}")
-        user = User.user_decoder_static(_user[0])
-        print(f"[INFO]: Retrieving object admin : {user}")
+        admin = Admin.user_decoder_static(_user[0])
+        print(f"[INFO]: Retrieving object admin : {admin}")
         con.commit()
         cursor.close()
         con.close()
-        return user
+        return admin
     except Exception as e:
         print(f"[Error]: {e}")
         return None
