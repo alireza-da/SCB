@@ -298,7 +298,8 @@ async def lyrics(ctx, filename):
     # print(lyrics)
     embedVar = discord.Embed(title="Lyrics", description=f"{g_filename}",
                              color=0x00ff00)
-    embedVar.add_field(name="", value=f"{lyrics}", inline=False)
+    for line in lyrics.splitlines():
+        embedVar.add_field(name="", value=f"{line}", inline=False)
     await ctx.channel.send(embed=embedVar)
 
 
