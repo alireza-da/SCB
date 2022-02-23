@@ -267,6 +267,7 @@ async def play_yt(ctx, url):
 @client.command(name="lyrics", help="Finding lyrics of song")
 async def lyrics(ctx):
     url = "https://genius.p.rapidapi.com/search"
+    print(g_filename)
     querystring = {"q": g_filename}
 
     headers = {
