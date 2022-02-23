@@ -1,7 +1,12 @@
 import functools
+import json
+import os
 import typing
 
 import discord
+import requests
+from bs4 import BeautifulSoup
+
 import credentials
 import logging
 
@@ -20,6 +25,7 @@ client = commands.Bot(command_prefix='$', intents=intents)
 # bot = commands.Bot(command_prefix='$',intents=intents)
 FFMPEG_OPTIONS = {}
 guild = None
+g_filename = ""
 
 
 # logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
@@ -248,9 +254,9 @@ async def play_yt(ctx, url):
                 print(f"Cannot connect to {voice_channel}")
                 print(f"[Error]: {e}")
             try:
-                filename = await YTDLSource.from_url(url, loop=client.loop)
-                vc.play(discord.FFmpegPCMAudio(source=filename))
-                await ctx.send('**Now playing:** {}'.format(filename))
+                g_filename = await YTDLSource.from_url(url, loop=client.loop)
+                vc.play(discord.FFmpegPCMAudio(source=g_filename))
+                await ctx.send('**Now playing:** {}'.format(g_filename))
             except Exception as e:
                 logging.error(f"{e}")
 
@@ -260,27 +266,43 @@ async def play_yt(ctx, url):
 
 @client.command(name="lyrics", help="Finding lyrics of song")
 async def lyrics(ctx, filename):
-    pass
-    # import requests
-    # from bs4 import BeautifulSoup
-    # url = "https://api.genius.com/search"
-    # querystring = {"q": "Kendrick Lamar DNA"}
-    # headers = {
-    #     'x-rapidapi-host': "sridurgayadav-chart-lyrics-v1.p.rapidapi.com",
-    #     'x-rapidapi-key': "02a32316e8msh2b227935eaa01e4p162017jsn3938d9cf143c"
-    # }
-    #
-    # response = requests.request("GET", url, headers=headers, params=querystring)
-    # html = BeautifulSoup(response.text, 'html.parser')
-    # lyrics1 = html.find("div", class_="lyrics")
-    # lyrics2 = html.find("div", class_="Lyrics__Container-sc-1ynbvzw-2 jgQsqn")
-    # if lyrics1:
-    #     lyrics = lyrics1.get_text()
-    # elif lyrics2:
-    #     lyrics = lyrics2.get_text()
-    # elif lyrics1 == lyrics2 == None:
-    #     lyrics = None
+    url = "https://genius.p.rapidapi.com/search"
+    t_f = g_filename
+    if filename:
+        t_f = filename
+    querystring = {"q": t_f}
+
+    headers = {
+        'x-rapidapi-host': "genius.p.rapidapi.com",
+        'x-rapidapi-key': os.environ["rapidapi_key"]
+    }
+
+    response = requests.request("GET", url, headers=headers, params=querystring)
+    json_res = json.loads(response.text)
+    url = json_res["response"]["hits"][0]["result"]["url"]
+    response = requests.request("GET", url)
+    html = BeautifulSoup(response.text, 'html.parser')
+    # print(html)
+    lyrics1 = html.find("div", id="lyrics-root")
+    lyrics2 = html.find("div", class_="Lyrics__Container-sc-1ynbvzw-2 jgQsqn")
+    # print(lyrics1)
+    lyrics = ""
+    if lyrics1:
+        lyrics = lyrics1.get_text()
+    elif lyrics2:
+        lyrics = lyrics2.get_text()
+    elif lyrics1 == lyrics2 is None:
+        lyrics = None
+
+    # formatting the lyrics
+    lyrics = lyrics.replace(", ", "\n")
+    lyrics = lyrics.replace("[", "\n[")
+    lyrics = lyrics.replace("]", "]\n")
     # print(lyrics)
+    embedVar = discord.Embed(title="Lyrics", description=f"{filename}",
+                             color=0x00ff00)
+    embedVar.add_field(name="", value=f"-{lyrics}", inline=False)
+    ctx.channe.send(embed=embedVar)
 
 
 keep_alive()
