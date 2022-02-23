@@ -265,12 +265,9 @@ async def play_yt(ctx, url):
 
 
 @client.command(name="lyrics", help="Finding lyrics of song")
-async def lyrics(ctx, filename):
+async def lyrics(ctx):
     url = "https://genius.p.rapidapi.com/search"
-    t_f = g_filename
-    if filename:
-        t_f = filename
-    querystring = {"q": t_f}
+    querystring = {"q": g_filename}
 
     headers = {
         'x-rapidapi-host': "genius.p.rapidapi.com",
@@ -301,7 +298,7 @@ async def lyrics(ctx, filename):
     # print(lyrics)
     embedVar = discord.Embed(title="Lyrics", description=f"{filename}",
                              color=0x00ff00)
-    embedVar.add_field(name="", value=f"-{lyrics}", inline=False)
+    embedVar.add_field(name="", value=f"{lyrics}", inline=False)
     await ctx.channel.send(embed=embedVar)
 
 

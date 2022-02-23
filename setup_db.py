@@ -22,10 +22,14 @@ def add_users_to_db(list_users):
                    """VALUES(%s, %s, %s, %s)"""
     values = []
     users = get_all_user()
+    uids = []
+    for user in users:
+        uids.append(user[2])
+
     for user in list_users:
         _user = User(user.name, 0, 0, user.id)
         value = (user.name, "0", str(user.id), "0")
-        if value not in values and (user.name, 0, user.id, 0) not in users:
+        if value not in values and user.id not in uids:
             values.append((user.name, "0", str(user.id), "0"))
         # if not get_user(_user.id):
         #     users.append(json.dumps(_user.__dict__))
@@ -48,7 +52,6 @@ def add_admins(list_users):
         if user.id in admins_id:
             value = (user.name, "0", str(user.id), "0")
             if value not in values and (user.name, 0, user.id, 0) not in admins:
-                print(value)
                 values.append(value)
 
     cursor.executemany(insertion_sql, values)
