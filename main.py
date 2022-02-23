@@ -25,7 +25,7 @@ client = commands.Bot(command_prefix='$', intents=intents)
 # bot = commands.Bot(command_prefix='$',intents=intents)
 FFMPEG_OPTIONS = {}
 guild = None
-g_filename = ""
+g_filename = "DEFAULT"
 
 
 # logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
@@ -266,10 +266,10 @@ async def play_yt(ctx, url):
 
 
 @client.command(name="lyrics", help="Finding lyrics of song")
-async def lyrics(ctx):
+async def lyrics(ctx, filename):
     url = "https://genius.p.rapidapi.com/search"
     print(g_filename)
-    querystring = {"q": g_filename}
+    querystring = {"q": filename}
 
     headers = {
         'x-rapidapi-host': "genius.p.rapidapi.com",
@@ -281,10 +281,8 @@ async def lyrics(ctx):
     url = json_res["response"]["hits"][0]["result"]["url"]
     response = requests.request("GET", url)
     html = BeautifulSoup(response.text, 'html.parser')
-    # print(html)
     lyrics1 = html.find("div", id="lyrics-root")
     lyrics2 = html.find("div", class_="Lyrics__Container-sc-1ynbvzw-2 jgQsqn")
-    # print(lyrics1)
     lyrics = ""
     if lyrics1:
         lyrics = lyrics1.get_text()
@@ -298,7 +296,7 @@ async def lyrics(ctx):
     lyrics = lyrics.replace("[", "\n[")
     lyrics = lyrics.replace("]", "]\n")
     # print(lyrics)
-    embedVar = discord.Embed(title="Lyrics", description=f"{filename}",
+    embedVar = discord.Embed(title="Lyrics", description=f"{g_filename}",
                              color=0x00ff00)
     embedVar.add_field(name="", value=f"{lyrics}", inline=False)
     await ctx.channel.send(embed=embedVar)
