@@ -254,6 +254,7 @@ async def play_yt(ctx, url):
                 print(f"Cannot connect to {voice_channel}")
                 print(f"[Error]: {e}")
             try:
+                global g_filename
                 g_filename = await YTDLSource.from_url(url, loop=client.loop)
                 vc.play(discord.FFmpegPCMAudio(source=g_filename))
                 await ctx.send('**Now playing:** {}'.format(g_filename))
