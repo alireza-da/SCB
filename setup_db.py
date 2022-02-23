@@ -15,24 +15,20 @@ admins_id = [665530648789909504, 583223852641812499]
 
 
 def add_users_to_db(list_users):
-    users = db["users"]
+    # users = db["users"]
     con, cursor = create_connection()
 
     insert_query = """INSERT INTO users(username, social_credits, id, level) """ \
                    """VALUES(%s, %s, %s, %s)"""
     values = []
+    users = get_all_user()
     for user in list_users:
-        # print(f"user detail: {user.name, user.id}")
-        # try:
-        #     cursor.execute(f"""INSERT INTO users(username, social_credits, id, level) """
-        #                    f"""VALUES({user.name}, {0}, {user.id}, {user.id})""")
-        # except Exception as e:
-        #     print(e)
         _user = User(user.name, 0, 0, user.id)
-        if (user.name, "0", str(user.id), "0") not in values:
+        value = (user.name, "0", str(user.id), "0")
+        if value not in values and (user.name, 0, user.id, 0) not in users:
             values.append((user.name, "0", str(user.id), "0"))
-        if not get_user(_user.id):
-            users.append(json.dumps(_user.__dict__))
+        # if not get_user(_user.id):
+        #     users.append(json.dumps(_user.__dict__))
 
     cursor.executemany(insert_query, values)
     con.commit()
@@ -46,12 +42,14 @@ def add_admins(list_users):
     insertion_sql = """INSERT INTO admins(username, social_credits, id, level) """ \
                     """VALUES(%s, %s, %s, %s)"""
     values = []
+    admins = get_all_admins()
+    print(admins)
     for user in list_users:
         if user.id in admins_id:
-            if (user.name, "0", str(user.id), "0") not in values:
-                values.append((user.name, "0", str(user.id), "0"))
-            _user = Admin(user.name, 0, 0, user.id)
-            db["admins"].append(json.dumps(_user.__dict__))
+            value = (user.name, "0", str(user.id), "0")
+            if value not in values and (user.name, 0, user.id, 0) not in admins:
+                print(value)
+                values.append(value)
 
     cursor.executemany(insertion_sql, values)
     con.commit()
@@ -88,10 +86,10 @@ def setup_tables(list_users):
         cursor.close()
         con.commit()
         con.close()
-        add_users_to_db(list_users)
-        add_admins(list_users)
     except Exception as e:
-        print(f"[Error]: {e}")
+        print(f"[Error][Setup Tables]: {e}")
+    add_users_to_db(list_users)
+    add_admins(list_users)
     # print_tables()
 
 
@@ -105,16 +103,10 @@ def print_tables():
     con.commit()
 
 
-def delete_tables():
-    del db["users"]
-    del db["admins"]
-
-
 def get_user(id):
     user_ret = "SELECT * FROM users WHERE id = %s"
     con, cursor = create_connection()
     try:
-
         cursor.execute(user_ret, (id,))
         _user = cursor.fetchall()
         # print(f"[INFO]: Retrieving database user : {_user[0]}")
@@ -128,6 +120,34 @@ def get_user(id):
     except Exception as e:
         print(f"[Error]: {e}")
         return None
+
+
+def get_all_user():
+    sql = "SELECT * FROM users"
+    con, cursor = create_connection()
+    try:
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        con.commit()
+        cursor.close()
+        con.close()
+        return result
+    except Exception as e:
+        print(f"[Error]: {e}")
+
+
+def get_all_admins():
+    sql = "SELECT * FROM admins"
+    con, cursor = create_connection()
+    try:
+        cursor.execute(sql)
+        result = cursor.fetchall()
+        con.commit()
+        cursor.close()
+        con.close()
+        return result
+    except Exception as e:
+        print(f"[Error]: {e}")
 
 
 def get_user_id(id):

@@ -6,7 +6,7 @@ import credentials
 import logging
 
 from precommands import run_pre_commands
-from setup_db import setup_tables, get_user, update_user, get_user_occurance, get_admin, delete_tables, create_connection
+from setup_db import setup_tables, get_user, update_user, get_user_occurance, get_admin, create_connection
 from discord.ext import commands
 from respond_randomizer import evil_randomizer, happy_zarif_randomizer
 from keep_alive import keep_alive
@@ -224,7 +224,7 @@ async def p_zarif(message):
         source = discord.FFmpegPCMAudio("assets/zarif talking chinies.m4a", **FFMPEG_OPTIONS)
         vc.play(source)
     else:
-        await client.say('User is not in a channel.')
+        await message.channel.send('User is not in a channel.')
 
 
 @client.command(name="sc")
@@ -232,7 +232,7 @@ async def sc(ctx):
     user = ctx.message.author
     user = get_user(user.id)
     if user:
-        await ctx.send(f" your current social credit balance is {user.social_credit}")
+        await ctx.send(f"Your current social credit balance is {user.social_credit}")
 
 
 @client.command(name='play_yt', help='Stream an YT content')
@@ -247,7 +247,6 @@ async def play_yt(ctx, url):
             except Exception as e:
                 print(f"Cannot connect to {voice_channel}")
                 print(f"[Error]: {e}")
-                # await ctx.send("The bot is already connected to a voice channel.")
             try:
                 filename = await YTDLSource.from_url(url, loop=client.loop)
                 vc.play(discord.FFmpegPCMAudio(source=filename))
@@ -259,30 +258,30 @@ async def play_yt(ctx, url):
         print(f"[Error]: {e}")
 
 
-# @client.command(name='pause', help='This command pauses the song')
-# async def pause(ctx):
-#     voice_client = ctx.message.guild.voice_client
-#     if voice_client.is_playing():
-#       await ctx.send("paused")
-#       await voice_client.pause()
-#     else:
-#       await ctx.send("The bot is not playing anything at the moment.")
+@client.command(name="lyrics", help="Finding lyrics of song")
+async def lyrics(ctx, filename):
+    pass
+    # import requests
+    # from bs4 import BeautifulSoup
+    # url = "https://api.genius.com/search"
+    # querystring = {"q": "Kendrick Lamar DNA"}
+    # headers = {
+    #     'x-rapidapi-host': "sridurgayadav-chart-lyrics-v1.p.rapidapi.com",
+    #     'x-rapidapi-key': "02a32316e8msh2b227935eaa01e4p162017jsn3938d9cf143c"
+    # }
+    #
+    # response = requests.request("GET", url, headers=headers, params=querystring)
+    # html = BeautifulSoup(response.text, 'html.parser')
+    # lyrics1 = html.find("div", class_="lyrics")
+    # lyrics2 = html.find("div", class_="Lyrics__Container-sc-1ynbvzw-2 jgQsqn")
+    # if lyrics1:
+    #     lyrics = lyrics1.get_text()
+    # elif lyrics2:
+    #     lyrics = lyrics2.get_text()
+    # elif lyrics1 == lyrics2 == None:
+    #     lyrics = None
+    # print(lyrics)
 
-# @client.command(name='resume', help='Resumes the song')
-# async def resume(ctx):
-#     voice_client = ctx.message.guild.voice_client
-#     if voice_client.is_paused():
-#         await voice_client.resume()
-#     else:
-#         await ctx.send("The bot was not playing anything before this. Use play_song command")
-
-# @client.command(name='stop', help='Stops the song')
-# async def stop(ctx):
-#     voice_client = ctx.message.guild.voice_client
-#     if voice_client.is_playing():
-#         await voice_client.stop()
-#     else:
-#         await ctx.send("The bot is not playing anything at the moment.")
 
 keep_alive()
 client.run(credentials.bot_token)
