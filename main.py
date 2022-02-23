@@ -269,7 +269,7 @@ async def play_yt(ctx, url):
 async def lyrics(ctx, filename):
     url = "https://genius.p.rapidapi.com/search"
     print(g_filename)
-    querystring = {"q": filename}
+    querystring = {"q": str(filename)}
 
     headers = {
         'x-rapidapi-host': "genius.p.rapidapi.com",
