@@ -302,7 +302,7 @@ async def lyrics(ctx, filename):
     embedVar = discord.Embed(title="Lyrics", description=f"{filename}",
                              color=0x00ff00)
     embedVar.add_field(name="", value=f"-{lyrics}", inline=False)
-    ctx.channe.send(embed=embedVar)
+    ctx.channel.send(embed=embedVar)
 
 
 keep_alive()
