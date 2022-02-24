@@ -277,7 +277,16 @@ async def lyrics(ctx, filename):
 
     response = requests.request("GET", url, headers=headers, params=querystring)
     json_res = json.loads(response.text)
-    url = json_res["response"]["hits"][0]["result"]["url"]
+    try:
+        url = json_res["response"]["hits"][0]["result"]["url"]
+    except Exception as e:
+        print(e)
+        embedVar = discord.Embed(title="Lyrics", description=f"{filename}",
+                                 color=0x00ff00)
+
+        embedVar.add_field(name="Error", value="Couldn't find anything", inline=False)
+        ctx.channel.send(embed=embedVar)
+
     response = requests.request("GET", url)
     html = BeautifulSoup(response.text, 'html.parser')
     lyrics1 = html.find("div", id="lyrics-root")
