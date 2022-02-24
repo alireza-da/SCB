@@ -268,7 +268,6 @@ async def play_yt(ctx, url):
 @client.command(name="lyrics", help="Finding lyrics of song")
 async def lyrics(ctx, filename):
     url = "https://genius.p.rapidapi.com/search"
-    print(g_filename)
     querystring = {"q": str(filename)}
 
     headers = {
@@ -299,8 +298,14 @@ async def lyrics(ctx, filename):
     embedVar = discord.Embed(title="Lyrics", description=f"{g_filename}",
                              color=0x00ff00)
     for line in lyrics.splitlines():
-        embedVar.add_field(name="-", value=f"{line}", inline=False)
-    await ctx.channel.send(f"```{lyrics}```")
+        embedVar.add_field(name="", value=f"{line}", inline=False)
+    if len(lyrics) < 2000:
+        await ctx.channel.send(f"```{lyrics}```")
+    else:
+        sections = [lyrics[i:i + 2000] for i in range(0, len(lyrics), 2000)]
+        for section in sections:
+            await ctx.channel.send(f"```{section}```")
+
 
 
 keep_alive()
