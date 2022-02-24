@@ -300,7 +300,7 @@ async def lyrics(ctx, filename):
                              color=0x00ff00)
     for line in lyrics.splitlines():
         embedVar.add_field(name="-", value=f"{line}", inline=False)
-    await ctx.channel.send(embed=embedVar)
+    await ctx.channel.send(f"```{lyrics}```")
 
 
 keep_alive()
