@@ -294,7 +294,13 @@ async def lyrics(ctx, filename):
     lyrics = lyrics.replace(", ", "\n")
     lyrics = lyrics.replace("[", "\n[")
     lyrics = lyrics.replace("]", "]\n")
+    for i in range(len(lyrics)):
+        if i+1 < len(lyrics):
+            if lyrics[i].islower() and lyrics[i+1].isupper():
+                print(lyrics[i].islower(), lyrics[i+1].isupper())
+                lyrics.replace(f"{lyrics[i]}{lyrics[i+1]}", f"{lyrics[i]}\n{lyrics[i+1]}")
     # print(lyrics)
+    # sending lyrics as a message or messages
     embedVar = discord.Embed(title="Lyrics", description=f"{g_filename}",
                              color=0x00ff00)
     for line in lyrics.splitlines():
