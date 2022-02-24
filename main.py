@@ -302,7 +302,7 @@ async def lyrics(ctx, filename):
     if len(lyrics) < 2000:
         await ctx.channel.send(f"```{lyrics}```")
     else:
-        sections = [lyrics[i:i + 2000] for i in range(0, len(lyrics), 2000)]
+        sections = [lyrics[i:i + 1998] for i in range(0, len(lyrics), 1998)]
         for section in sections:
             await ctx.channel.send(f"```{section}```")
 
